@@ -1,0 +1,124 @@
+@use '@angular/material' as mat;
+
+// ── Google Fonts ─────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// ── Design Tokens ────────────────────────────────────────────────────────────
+:root {
+  // Brand
+  --primary:        #6c63ff;
+  --primary-light:  rgba(108, 99, 255, 0.12);
+  --accent:         #f50057;
+  --success:        #4caf50;
+  --warning:        #ff9800;
+  --error:          #f44336;
+
+  // Shadows
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.12);
+  --shadow-xl:  0 20px 60px rgba(0,0,0,.18);
+}
+
+// ── Dark Theme ───────────────────────────────────────────────────────────────
+[data-theme="dark"], .dark-theme {
+  --bg:             #0f0f13;
+  --bg-gradient:    linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --surface:        #1e1e2e;
+  --sidebar-bg:     #151522;
+  --border:         rgba(255,255,255,.08);
+  --text-primary:   #e8e8f0;
+  --text-secondary: #9090a8;
+  --text-disabled:  #505060;
+}
+
+// ── Light Theme ──────────────────────────────────────────────────────────────
+[data-theme="light"], .light-theme {
+  --bg:             #f8f8fc;
+  --bg-gradient:    linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --surface:        #ffffff;
+  --sidebar-bg:     #f0f0f8;
+  --border:         rgba(0,0,0,.1);
+  --text-primary:   #1a1a2e;
+  --text-secondary: #6060a0;
+  --text-disabled:  #b0b0c8;
+}
+
+// ── Base Reset ───────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: background .3s ease, color .3s ease;
+}
+
+// ── Scrollbar ────────────────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108,99,255,.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(108,99,255,.6); }
+
+// ── Snackbar overrides ───────────────────────────────────────────────────────
+.snack-error .mdc-snackbar__surface { background: #d32f2f !important; }
+
+// ── Angular Material overrides ───────────────────────────────────────────────
+.mat-mdc-card {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-form-field {
+  color: var(--text-primary) !important;
+}
+
+// Input text color
+.mat-mdc-input-element,
+.mat-mdc-form-field input,
+.mat-mdc-form-field textarea,
+.mdc-text-field__input {
+  color: var(--text-primary) !important;
+  caret-color: var(--primary) !important;
+}
+
+// Floating label color
+.mat-mdc-form-field .mdc-floating-label,
+.mat-mdc-form-field .mat-mdc-floating-label {
+  color: var(--text-secondary) !important;
+}
+
+// Outlined border color
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+
+// Focused border
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+}
+
+// Suffix/prefix icon color
+.mat-mdc-form-field .mat-mdc-form-field-icon-suffix mat-icon,
+.mat-mdc-form-field .mat-mdc-form-field-icon-prefix mat-icon {
+  color: var(--text-secondary) !important;
+}
+
+// Select & option text
+.mat-mdc-select-value, .mat-mdc-select-arrow {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-list-item:hover { background: var(--primary-light) !important; }
+
+// ── Utility classes ──────────────────────────────────────────────────────────
+.spacer { flex: 1; }
+.text-center { text-align: center; }
+.text-secondary { color: var(--text-secondary); }

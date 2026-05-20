@@ -1,0 +1,45 @@
+# ──────────────────────────────────────────────────────────────
+# Production profile — activates with: SPRING_PROFILES_ACTIVE=prod
+# All sensitive values MUST be supplied via environment variables.
+# ──────────────────────────────────────────────────────────────
+
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    clean-on-validation-error: false  # NEVER drop the DB in production
+
+server:
+  # Enable HTTPS redirect (Nginx handles TLS termination)
+  forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+logging:
+  level:
+    com.securechat:            WARN
+    org.springframework.security: WARN
+    org.springframework.web.socket: WARN
+    root: WARN
+
+# Production JWT settings — values come from Docker / k8s secrets
+app:
+  jwt:
+    secret:                    ${JWT_SECRET}           # REQUIRED — 256-bit random string
+    access-token-expiration-ms:  ${JWT_ACCESS_EXPIRY_MS:900000}    # 15 min default
+    refresh-token-expiration-ms: ${JWT_REFRESH_EXPIRY_MS:604800000} # 7 days default
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}            # REQUIRED — e.g. https://yourchat.app
+  websocket:
+    allowed-origins: ${WS_ALLOWED_ORIGINS}              # REQUIRED — e.g. https://yourchat.app
+
+management:
+  endpoint:
+    health:
+      show-details: never   # Don't expose internals publicly

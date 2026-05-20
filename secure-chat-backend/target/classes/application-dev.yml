@@ -1,0 +1,34 @@
+# ──────────────────────────────────────────────────────────────
+# Development profile — activates with: SPRING_PROFILES_ACTIVE=dev
+# Inherits all settings from application.yml and overrides below.
+# ──────────────────────────────────────────────────────────────
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Flyway: allow drop+recreate in dev (never in prod!)
+  flyway:
+    clean-on-validation-error: false   # keep false even in dev; run flyway:clean manually
+
+# More verbose logging in dev
+logging:
+  level:
+    com.securechat:            DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.hibernate.SQL:         DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+
+# Shorter token TTLs so you can test refresh logic quickly
+app:
+  jwt:
+    access-token-expiration-ms:  300000   # 5 min
+    refresh-token-expiration-ms: 3600000  # 1 hour
+  cors:
+    allowed-origins: "http://localhost:4200,http://localhost:3000"
+  websocket:
+    allowed-origins: "http://localhost:4200,http://localhost:3000"

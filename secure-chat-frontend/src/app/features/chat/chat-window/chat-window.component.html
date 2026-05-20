@@ -1,0 +1,72 @@
+<div class="chat-window" *ngIf="room; else noRoom">
+  <!-- Room Header -->
+  <div class="room-header">
+    <div class="room-avatar">{{ (room.name || 'DM').slice(0,2).toUpperCase() }}</div>
+    <div class="room-info">
+      <h3 class="room-name">{{ room.name || 'Direct Message' }}</h3>
+      <span class="room-meta">{{ room.type }} · {{ room.memberCount }} members</span>
+    </div>
+    <button mat-icon-button matTooltip="Members" id="btn-room-members">
+      <mat-icon>group</mat-icon>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages-container" #messagesContainer>
+    <div *ngIf="loading" class="loading-center">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <app-message-bubble
+      *ngFor="let msg of messages; trackBy: trackMsg"
+      [message]="msg"
+      [own]="isOwnMessage(msg)"
+      (reply)="onReply($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)">
+    </app-message-bubble>
+
+    <!-- Typing Indicator -->
+    <app-typing-indicator [count]="typingCount"></app-typing-indicator>
+  </div>
+
+  <!-- Reply/Edit Banner -->
+  <div class="context-banner reply-banner" *ngIf="replyTo">
+    <mat-icon>reply</mat-icon>
+    <span>Replying to <strong>{{ replyTo.sender.displayName }}</strong></span>
+    <button mat-icon-button (click)="cancelReply()" id="btn-cancel-reply">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="context-banner edit-banner" *ngIf="editingMessage">
+    <mat-icon>edit</mat-icon>
+    <span>Editing message</span>
+    <button mat-icon-button (click)="cancelEdit()" id="btn-cancel-edit">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Input Area -->
+  <div class="message-input-area">
+    <mat-form-field appearance="outline" class="message-field">
+      <input matInput [(ngModel)]="messageContent"
+             (keydown.enter)="sendMessage()"
+             (input)="onTyping()"
+             [placeholder]="editingMessage ? 'Edit message…' : 'Type a message…'"
+             id="chat-message-input" [disabled]="sending">
+    </mat-form-field>
+    <button mat-fab color="primary" (click)="sendMessage()"
+            [disabled]="!messageContent.trim() || sending"
+            id="btn-send-message" class="send-btn">
+      <mat-icon>{{ editingMessage ? 'check' : 'send' }}</mat-icon>
+    </button>
+  </div>
+</div>
+
+<ng-template #noRoom>
+  <div class="no-room-placeholder">
+    <mat-icon>chat_bubble_outline</mat-icon>
+    <h2>Select a conversation</h2>
+    <p>Choose a room from the sidebar to start chatting</p>
+  </div>
+</ng-template>
