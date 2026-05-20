@@ -9,7 +9,9 @@ import com.securechat.enums.MemberRole;
 import com.securechat.enums.RoomType;
 import com.securechat.exception.ResourceNotFoundException;
 import com.securechat.exception.RoomAccessException;
+import com.securechat.dto.response.RoomMemberDto;
 import com.securechat.mapper.ChatRoomMapper;
+import com.securechat.mapper.UserMapper;
 import com.securechat.repository.ChatRoomRepository;
 import com.securechat.repository.RoomMembershipRepository;
 import com.securechat.repository.UserRepository;
@@ -29,6 +31,7 @@ public class ChatRoomService {
     private final RoomMembershipRepository membershipRepository;
     private final UserRepository userRepository;
     private final ChatRoomMapper roomMapper;
+    private final UserMapper userMapper;
 
     @Transactional
     public ChatRoomDto createRoom(CreateRoomRequest req, UUID creatorId) {
@@ -81,6 +84,15 @@ public class ChatRoomService {
         assertMember(roomId, userId);
         ChatRoom room = getRoom(roomId);
         return roomMapper.toDto(room, membershipRepository.countByRoomId(roomId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoomMemberDto> getRoomMembers(UUID roomId, UUID userId) {
+        assertMember(roomId, userId);
+        return membershipRepository.findByRoomId(roomId)
+                .stream()
+                .map(m -> new RoomMemberDto(userMapper.toDto(m.getUser()), m.getRole()))
+                .collect(Collectors.toList());
     }
 
     @Transactional

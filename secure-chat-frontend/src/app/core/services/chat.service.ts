@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ChatRoom, Message, PagedResponse, SendMessageRequest } from '../models/models';
+import { ChatRoom, Message, PagedResponse, SendMessageRequest, RoomMember } from '../models/models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -23,6 +23,10 @@ export class ChatService {
 
   getRoom(id: string): Observable<ChatRoom> {
     return this.http.get<ChatRoom>(`${this.roomsUrl}/${id}`);
+  }
+
+  getRoomMembers(roomId: string): Observable<RoomMember[]> {
+    return this.http.get<RoomMember[]>(`${this.roomsUrl}/${roomId}/members`);
   }
 
   addMember(roomId: string, userId: string): Observable<void> {

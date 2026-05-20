@@ -2,6 +2,7 @@ package com.securechat.controller;
 
 import com.securechat.dto.request.CreateRoomRequest;
 import com.securechat.dto.response.ChatRoomDto;
+import com.securechat.dto.response.RoomMemberDto;
 import com.securechat.dto.response.UserDto;
 import com.securechat.service.ChatRoomService;
 import com.securechat.service.UserService;
@@ -52,6 +53,13 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetails principal) {
         roomService.deleteRoom(id, resolveUserId(principal));
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/members")
+    public ResponseEntity<List<RoomMemberDto>> getRoomMembers(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(roomService.getRoomMembers(id, resolveUserId(principal)));
     }
 
     @PostMapping("/{id}/members")

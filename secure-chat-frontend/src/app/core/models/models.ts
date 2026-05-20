@@ -69,3 +69,9 @@ export interface SendMessageRequest {
   contentType?: 'TEXT' | 'IMAGE' | 'FILE';
   replyToId?: string;
 }
+
+export interface RoomMember {
+  user: User;
+  role: 'MEMBER' | 'ADMIN' | 'OWNER';
+}
+

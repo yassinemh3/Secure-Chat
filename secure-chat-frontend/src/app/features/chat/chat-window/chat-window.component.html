@@ -1,65 +1,138 @@
-<div class="chat-window" *ngIf="room; else noRoom">
-  <!-- Room Header -->
-  <div class="room-header">
-    <div class="room-avatar">{{ (room.name || 'DM').slice(0,2).toUpperCase() }}</div>
-    <div class="room-info">
-      <h3 class="room-name">{{ room.name || 'Direct Message' }}</h3>
-      <span class="room-meta">{{ room.type }} · {{ room.memberCount }} members</span>
-    </div>
-    <button mat-icon-button matTooltip="Members" id="btn-room-members">
-      <mat-icon>group</mat-icon>
-    </button>
-  </div>
-
-  <!-- Messages -->
-  <div class="messages-container" #messagesContainer>
-    <div *ngIf="loading" class="loading-center">
-      <mat-spinner diameter="40"></mat-spinner>
+<div class="chat-container" *ngIf="room; else noRoom">
+  <div class="chat-window-main">
+    <!-- Room Header -->
+    <div class="room-header">
+      <div class="room-avatar">{{ (room.name || 'DM').slice(0,2).toUpperCase() }}</div>
+      <div class="room-info">
+        <h3 class="room-name">{{ room.name || 'Direct Message' }}</h3>
+        <span class="room-meta">{{ room.type }} · {{ room.memberCount }} members</span>
+      </div>
+      <button mat-icon-button matTooltip="Members" id="btn-room-members" (click)="toggleMembersSidebar()" [color]="showMembersSidebar ? 'primary' : null">
+        <mat-icon>group</mat-icon>
+      </button>
     </div>
 
-    <app-message-bubble
-      *ngFor="let msg of messages; trackBy: trackMsg"
-      [message]="msg"
-      [own]="isOwnMessage(msg)"
-      (reply)="onReply($event)"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)">
-    </app-message-bubble>
+    <!-- Messages -->
+    <div class="messages-container" #messagesContainer>
+      <div *ngIf="loading" class="loading-center">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
 
-    <!-- Typing Indicator -->
-    <app-typing-indicator [count]="typingCount"></app-typing-indicator>
+      <app-message-bubble
+        *ngFor="let msg of messages; trackBy: trackMsg"
+        [message]="msg"
+        [own]="isOwnMessage(msg)"
+        (reply)="onReply($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)">
+      </app-message-bubble>
+
+      <!-- Typing Indicator -->
+      <app-typing-indicator [count]="typingCount"></app-typing-indicator>
+    </div>
+
+    <!-- Reply/Edit Banner -->
+    <div class="context-banner reply-banner" *ngIf="replyTo">
+      <mat-icon>reply</mat-icon>
+      <span>Replying to <strong>{{ replyTo.sender.displayName }}</strong></span>
+      <button mat-icon-button (click)="cancelReply()" id="btn-cancel-reply">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="context-banner edit-banner" *ngIf="editingMessage">
+      <mat-icon>edit</mat-icon>
+      <span>Editing message</span>
+      <button mat-icon-button (click)="cancelEdit()" id="btn-cancel-edit">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="message-input-area">
+      <mat-form-field appearance="outline" class="message-field">
+        <input matInput [(ngModel)]="messageContent"
+               (keydown.enter)="sendMessage()"
+               (input)="onTyping()"
+               [placeholder]="editingMessage ? 'Edit message…' : 'Type a message…'"
+               id="chat-message-input" [disabled]="sending">
+      </mat-form-field>
+      <button mat-fab color="primary" (click)="sendMessage()"
+              [disabled]="!messageContent.trim() || sending"
+              id="btn-send-message" class="send-btn">
+        <mat-icon>{{ editingMessage ? 'check' : 'send' }}</mat-icon>
+      </button>
+    </div>
   </div>
 
-  <!-- Reply/Edit Banner -->
-  <div class="context-banner reply-banner" *ngIf="replyTo">
-    <mat-icon>reply</mat-icon>
-    <span>Replying to <strong>{{ replyTo.sender.displayName }}</strong></span>
-    <button mat-icon-button (click)="cancelReply()" id="btn-cancel-reply">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-  <div class="context-banner edit-banner" *ngIf="editingMessage">
-    <mat-icon>edit</mat-icon>
-    <span>Editing message</span>
-    <button mat-icon-button (click)="cancelEdit()" id="btn-cancel-edit">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
+  <!-- Members Sidebar sliding drawer -->
+  <div class="members-sidebar" [class.open]="showMembersSidebar">
+    <div class="sidebar-header">
+      <h3>Members</h3>
+      <button mat-icon-button (click)="toggleMembersSidebar()" id="btn-close-members" matTooltip="Hide Panel">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
 
-  <!-- Input Area -->
-  <div class="message-input-area">
-    <mat-form-field appearance="outline" class="message-field">
-      <input matInput [(ngModel)]="messageContent"
-             (keydown.enter)="sendMessage()"
-             (input)="onTyping()"
-             [placeholder]="editingMessage ? 'Edit message…' : 'Type a message…'"
-             id="chat-message-input" [disabled]="sending">
-    </mat-form-field>
-    <button mat-fab color="primary" (click)="sendMessage()"
-            [disabled]="!messageContent.trim() || sending"
-            id="btn-send-message" class="send-btn">
-      <mat-icon>{{ editingMessage ? 'check' : 'send' }}</mat-icon>
-    </button>
+    <!-- Invite New Members (only if GROUP and current user is Admin/Owner) -->
+    <div class="invite-section" *ngIf="room.type === 'GROUP' && isCurrentUserAdminOrOwner()">
+      <h4 class="section-title">Add Member</h4>
+      <mat-form-field appearance="outline" class="invite-field">
+        <mat-label>Search users by name…</mat-label>
+        <input matInput [(ngModel)]="memberSearchQuery" (input)="onMemberSearchInput()" id="input-invite-user" autocomplete="off">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Autocomplete Dropdown overlay -->
+      <div class="search-results-dropdown" *ngIf="searchResults.length > 0">
+        <div class="search-result-item" *ngFor="let user of searchResults" (click)="addMember(user)">
+          <div class="user-avatar-small">{{ user.displayName.slice(0,2).toUpperCase() }}</div>
+          <div class="user-name-info">
+            <span class="display-name">{{ user.displayName }}</span>
+            <span class="user-username">&#64;{{ user.username }}</span>
+          </div>
+          <mat-icon class="add-icon" color="primary">add</mat-icon>
+        </div>
+      </div>
+      <div class="no-results" *ngIf="memberSearchQuery.trim() && searchResults.length === 0 && !searchingUsers">
+        No matches found
+      </div>
+      <div class="searching-spinner" *ngIf="searchingUsers">
+        <mat-spinner diameter="20"></mat-spinner>
+      </div>
+    </div>
+
+    <!-- Members list -->
+    <div class="members-list-section">
+      <h4 class="section-title">Current Members ({{ members.length }})</h4>
+      <div *ngIf="loadingMembers" class="spinner-center">
+        <mat-spinner diameter="30"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loadingMembers" class="members-list">
+        <div class="member-item" *ngFor="let m of members">
+          <div class="member-avatar">
+            {{ m.user.displayName.slice(0,2).toUpperCase() }}
+          </div>
+          <div class="member-info">
+            <span class="member-name">{{ m.user.displayName }}</span>
+            <span class="member-role" [class]="m.role.toLowerCase()">{{ m.role }}</span>
+          </div>
+
+          <!-- Actions: Remove / Leave -->
+          <button mat-icon-button
+                  *ngIf="room.type === 'GROUP' && (isCurrentUserAdminOrOwner() || isCurrentUser(m.user.id)) && m.role !== 'OWNER'"
+                  (click)="removeMember(m.user.id, m.user.displayName)"
+                  [matTooltip]="isCurrentUser(m.user.id) ? 'Leave Room' : 'Remove Member'"
+                  [disabled]="removingMemberId === m.user.id"
+                  class="remove-btn">
+            <mat-icon *ngIf="removingMemberId !== m.user.id" [color]="isCurrentUser(m.user.id) ? 'warn' : 'accent'">
+              {{ isCurrentUser(m.user.id) ? 'logout' : 'person_remove' }}
+            </mat-icon>
+            <mat-spinner *ngIf="removingMemberId === m.user.id" diameter="18"></mat-spinner>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -70,3 +143,4 @@
     <p>Choose a room from the sidebar to start chatting</p>
   </div>
 </ng-template>
+

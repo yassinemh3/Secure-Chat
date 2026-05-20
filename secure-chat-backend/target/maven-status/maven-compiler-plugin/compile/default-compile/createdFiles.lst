@@ -58,6 +58,7 @@ com\securechat\entity\User.class
 com\securechat\repository\ChatRoomRepository.class
 com\securechat\repository\RefreshTokenRepository.class
 com\securechat\enums\MemberRole.class
+com\securechat\dto\response\RoomMemberDto.class
 com\securechat\service\MessageService.class
 com\securechat\dto\response\ChatRoomDto.class
 com\securechat\controller\ChatRoomController.class

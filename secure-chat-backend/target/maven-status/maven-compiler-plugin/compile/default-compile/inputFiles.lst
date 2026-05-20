@@ -1,6 +1,7 @@
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\entity\Message.java
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\enums\ContentType.java
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\exception\ResourceNotFoundException.java
+C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\dto\response\RoomMemberDto.java
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\controller\AuthController.java
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\exception\RoomAccessException.java
 C:\Users\yassi\OneDrive\Desktop\Secure_chat\Secure-Chat\secure-chat-backend\src\main\java\com\securechat\service\NotificationService.java
