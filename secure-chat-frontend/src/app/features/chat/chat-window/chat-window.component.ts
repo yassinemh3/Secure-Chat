@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -63,6 +63,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy, AfterViewChecked 
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private chatService: ChatService,
     private wsService: WebSocketService,
     public authService: AuthService,
@@ -265,7 +266,8 @@ export class ChatWindowComponent implements OnInit, OnDestroy, AfterViewChecked 
 
         if (isSelf) {
           this.showMembersSidebar = false;
-          window.location.reload();
+          this.chatService.roomsChanged$.next();
+          this.router.navigate(['/chat']);
         } else {
           this.loadMembers();
           if (this.room) {
@@ -276,6 +278,25 @@ export class ChatWindowComponent implements OnInit, OnDestroy, AfterViewChecked 
       error: (err) => {
         this.removingMemberId = null;
         this.snackBar.open(err?.error?.message || 'Failed to remove member', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  deleteRoom(): void {
+    if (!this.room) return;
+    const roomName = this.room.name || 'this conversation';
+    if (!confirm(`Are you sure you want to delete "${roomName}"? This will delete all messages and memberships permanently for everyone.`)) {
+      return;
+    }
+
+    this.chatService.deleteRoom(this.room.id).subscribe({
+      next: () => {
+        this.snackBar.open(`Room "${roomName}" deleted successfully`, 'Close', { duration: 3000 });
+        this.chatService.roomsChanged$.next();
+        this.router.navigate(['/chat']);
+      },
+      error: (err) => {
+        this.snackBar.open(err?.error?.message || 'Failed to delete room', 'Close', { duration: 3000 });
       }
     });
   }

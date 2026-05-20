@@ -124,6 +124,10 @@ export class ChatSidebarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadRooms();
 
+    // Subscribe to reactive room list updates
+    this.chatService.roomsChanged$.pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadRooms());
+
     // Real-time presence updates
     this.wsService.presence$.pipe(takeUntil(this.destroy$))
       .subscribe(p => this.presenceMap.set(p.userId, p.status));

@@ -7,6 +7,11 @@
         <h3 class="room-name">{{ room.name || 'Direct Message' }}</h3>
         <span class="room-meta">{{ room.type }} · {{ room.memberCount }} members</span>
       </div>
+      <!-- Delete Room Button (Only for Creator/Owner) -->
+      <button mat-icon-button *ngIf="isCurrentUser(room.createdBy.id)" color="warn" matTooltip="Delete Room" id="btn-delete-room" (click)="deleteRoom()">
+        <mat-icon>delete</mat-icon>
+      </button>
+
       <button mat-icon-button matTooltip="Members" id="btn-room-members" (click)="toggleMembersSidebar()" [color]="showMembersSidebar ? 'primary' : null">
         <mat-icon>group</mat-icon>
       </button>

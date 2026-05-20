@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ChatRoom, Message, PagedResponse, SendMessageRequest, RoomMember } from '../models/models';
 import { environment } from '../../../environments/environment';
 
@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 export class ChatService {
   private readonly roomsUrl = `${environment.apiUrl}/rooms`;
   private readonly msgUrl   = `${environment.apiUrl}`;
+  readonly roomsChanged$ = new Subject<void>();
 
   constructor(private http: HttpClient) {}
 
@@ -59,5 +60,9 @@ export class ChatService {
 
   deleteMessage(messageId: string): Observable<void> {
     return this.http.delete<void>(`${this.msgUrl}/messages/${messageId}`);
+  }
+
+  deleteRoom(roomId: string): Observable<void> {
+    return this.http.delete<void>(`${this.roomsUrl}/${roomId}`);
   }
 }
